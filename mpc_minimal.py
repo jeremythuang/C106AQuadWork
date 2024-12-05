@@ -156,7 +156,7 @@ if __name__ == "__main__":
     memory['cmd'] = np.vstack(memory['cmd'])
 
     ctrl_pred_x = np.stack(ctrl_pred_x)
-
+ 
     animator = Animator(memory['state'], true_times, memory['state'], max_frames=500, save_path='data', state_prediction=ctrl_pred_x, drawCylinder=True)
     animator.animate()
 

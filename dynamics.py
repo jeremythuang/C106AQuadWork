@@ -17,7 +17,7 @@ def get_quad_params():
     params["g"]    = 9.81      # gravity (m/s/s)
     params["dxm"]  = 0.16      # arm length (m)
     params["dym"]  = 0.16      # arm length (m)
-    params["dzm"]  = 0.05      # motor height (m)
+    params["dzm"]  = 0.05     # motor height (m)
 
     params["IB"]   = np.array(
                         [[0.0123, 0,      0     ],
@@ -251,7 +251,7 @@ class state_dot:
             [
                 xdot,
                 ydot,
-                zdot,
+                0, #zdot,
                 -0.5 * p * q1 - 0.5 * q * q2 - 0.5 * q3 * r,
                 0.5 * p * q0 - 0.5 * q * q3 + 0.5 * q2 * r,
                 0.5 * p * q3 + 0.5 * q * q0 - 0.5 * q1 * r,
@@ -353,18 +353,18 @@ class state_dot:
         DynamicsDot = ca.vertcat(
                 xdot,
                 ydot,
-                zdot,
-                -0.5 * p * q1 - 0.5 * q * q2 - 0.5 * q3 * r,
-                0.5 * p * q0 - 0.5 * q * q3 + 0.5 * q2 * r,
-                0.5 * p * q3 + 0.5 * q * q0 - 0.5 * q1 * r,
-                -0.5 * p * q2 + 0.5 * q * q1 + 0.5 * q0 * r,
+                0, # zdot,
+                0, #-0.5 * p * q1 - 0.5 * q * q2 - 0.5 * q3 * r,
+                0, #0.5 * p * q0 - 0.5 * q * q3 + 0.5 * q2 * r,
+                0, #0.5 * p * q3 + 0.5 * q * q0 - 0.5 * q1 * r,
+                0, #-0.5 * p * q2 + 0.5 * q * q1 + 0.5 * q0 * r,
                 (
                     params["Cd"]
                     * ca.sign(velW * ca.cos(qW1) * ca.cos(qW2) - xdot)
                     * (velW * ca.cos(qW1) * ca.cos(qW2) - xdot) ** 2
                     - 2 * (q0 * q2 + q1 * q3) * (ThrM1 + ThrM2 + ThrM3 + ThrM4)
                 )
-                / params["mB"],
+                / params["mB"]
                 (
                     params["Cd"]
                     * ca.sign(velW * ca.sin(qW1) * ca.cos(qW2) - ydot)
