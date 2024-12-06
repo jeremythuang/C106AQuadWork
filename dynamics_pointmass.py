@@ -14,7 +14,7 @@ def get_quad_params():
     # modification to test differentiability improvement:
     # params["mB"] = 0.5
 
-    params["g"]    = 0.0      # gravity (m/s/s)
+    params["g"]    = 9.81      # gravity (m/s/s)
     params["dxm"]  = 0.16      # arm length (m)
     params["dym"]  = 0.16      # arm length (m)
     params["dzm"]  = 0.05     # motor height (m)
@@ -59,9 +59,7 @@ def get_quad_params():
         0,                  # q
         0,                  # r
         522.9847140714692,  # wM1
-        522.9847140714692,  # wM2
-        522.9847140714692,  # wM3
-        522.9847140714692   # wM4
+        522.9847140714692  # wM2
     ]
 
     params["default_init_state_np"] = np.array(params["default_init_state_list"])
@@ -81,9 +79,7 @@ def get_quad_params():
         50,
         50,
         params["maxWmotor"],
-        params["maxWmotor"],
-        params["maxWmotor"],
-        params["maxWmotor"],
+        params["maxWmotor"]
     ])
 
     params["state_lb"] = np.array([
@@ -101,9 +97,7 @@ def get_quad_params():
         - 50,
         - 50,
         params["minWmotor"],
-        params["minWmotor"],
-        params["minWmotor"],
-        params["minWmotor"],
+        params["minWmotor"]
     ])
 
     params["rl_min"] = [
@@ -121,9 +115,7 @@ def get_quad_params():
         - 0.05,
         - 0.05,
         params["minWmotor"],
-        params["minWmotor"],
-        params["minWmotor"],
-        params["minWmotor"],
+        params["minWmotor"]
     ]
 
     params["rl_max"] = [
@@ -141,9 +133,7 @@ def get_quad_params():
         0.05,
         0.05,
         params["maxWmotor"],
-        params["maxWmotor"],
-        params["maxWmotor"],
-        params["maxWmotor"],
+        params["maxWmotor"]
     ]
 
 
@@ -158,7 +148,7 @@ def get_quad_params():
         1.66870635e-02,  1.80049500e-02, 1.90097617e-02, 3.94781769e-02, 
         6.79250264e-01,  5.99078863e-01, 5.46886039e-01, 
         1.51097522e+00, 1.48196943e+00,  2.04250634e-02, 
-        6.02421510e+03, 6.00728172e+03, 5.79842870e+03,  6.09344182e+03
+        6.02421510e+03, 6.00728172e+03
     ])
 
     params["state_mean"] = np.array([
@@ -166,7 +156,7 @@ def get_quad_params():
         1, 0, 0, 0, 
         -3.56579433e-02, -2.08600217e-02,  5.04818729e-02, 
         -3.33658909e-02,  5.77660876e-02,  5.01574786e-04,  
-        5.26444419e+02,  5.27135070e+02,  5.26640264e+02,  5.26382155e+02
+        5.26444419e+02,  5.27135070e+02
     ])
 
     params["rl_state_var"] = np.array([
@@ -184,23 +174,21 @@ def get_quad_params():
         -3.56579433e-02, -2.08600217e-02,  5.04818729e-02, 
         -3.33658909e-02,  5.77660876e-02,  5.01574786e-04,  
         5.26444419e+02,  5.27135070e+02,  5.26640264e+02,  5.26382155e+02, 
-        1, 1, 1
+        1
     ])
 
     params["state_dot_mean"] = np.array([
         0,  0,  0, 0,
         0,  0, 0, 0,
         0,  0, 0, 0,
-        0, 0,  0,  0,
-        0
+        0, 0,  0
     ])
 
     params["state_dot_var"] = np.array([
         1.05118748e-02, 4.84750726e+00, 4.86083715e+00, 1.53591744e-05,
         6.21927312e-05, 7.82977352e-02, 5.73502092e-05, 2.10500257e-01,
         2.31031707e-01, 1.24149857e-01, 1.24791653e-03, 3.39575201e-02,
-        3.30781614e-06, 8.59376433e-01, 8.50812394e-01, 8.64048027e-01,
-        8.64907141e-01
+        3.30781614e-06, 8.59376433e-01, 8.50812394e-01
     ])
 
     params["input_mean"] = np.array([
@@ -233,10 +221,10 @@ class state_dot:
         r =     state[12]
         wM1 =   state[13]
         wM2 =   state[14]
-        wM3 =   state[15]
-        wM4 =   state[16]
+        #wM3 =   state[15]
+        #wM4 =   state[16]
 
-        wMotor = np.stack([wM1, wM2, wM3, wM4])
+        wMotor = np.stack([wM1, wM2]) #wM3, wM4
         wMotor = np.clip(wMotor, params["minWmotor"], params["maxWmotor"])
         thrust = params["kTh"] * wMotor ** 2
         torque = params["kTo"] * wMotor ** 2
@@ -279,17 +267,17 @@ class state_dot:
                 / params["mB"],
                 (
                     (params["IB"][1,1] - params["IB"][2,2]) * q * r
-                    - params["usePrecession"] * params["IRzz"] * (wM1 - wM2 + wM3 - wM4) * q
+                    - params["usePrecession"] * params["IRzz"] * (wM1 - wM2 ) * q #+ wM3 - wM4
                     + (thrust[0] - thrust[1] - thrust[2] + thrust[3]) * params["dym"]
                 )
                 / params["IB"][0,0],  # uP activates or deactivates the use of gyroscopic precession.
                 (
                     (params["IB"][2,2] - params["IB"][0,0]) * p * r
-                    + params["usePrecession"] * params["IRzz"] * (wM1 - wM2 + wM3 - wM4) * p
+                    + params["usePrecession"] * params["IRzz"] * (wM1 - wM2 ) * p #+ wM3 - wM4
                     + (thrust[0] + thrust[1] - thrust[2] - thrust[3]) * params["dxm"]
                 )
                 / params["IB"][1,1],  # Set uP to False if rotor inertia is not known (gyro precession has negigeable effect on drone dynamics)
-                ((params["IB"][0,0] - params["IB"][1,1]) * p * q - torque[0] + torque[1] - torque[2] + torque[3]) / params["IB"][2,2],
+                ((params["IB"][0,0] - params["IB"][1,1]) * p * q - torque[0] + torque[1] - torque[2] + torque[3]) / params["IB"][2,2]
             ]
         )
 
@@ -329,20 +317,20 @@ class state_dot:
         p =     state[10]
         q =     state[11]
         r =     state[12]
-        wM1 =   state[13]
+        wM1 =   state[13] 
         wM2 =   state[14]
-        wM3 =   state[15]
-        wM4 =   state[16]
+        #wM3 =   state[15]
+        #wM4 =   state[16]
 
         # a tiny bit more readable
         ThrM1 = params["kTh"] * wM1 ** 2
         ThrM2 = params["kTh"] * wM2 ** 2
-        ThrM3 = params["kTh"] * wM3 ** 2
-        ThrM4 = params["kTh"] * wM4 ** 2
+        #ThrM3 = params["kTh"] * wM3 ** 2
+        #ThrM4 = params["kTh"] * wM4 ** 2
         TorM1 = params["kTo"] * wM1 ** 2
         TorM2 = params["kTo"] * wM2 ** 2
-        TorM3 = params["kTo"] * wM3 ** 2
-        TorM4 = params["kTo"] * wM4 ** 2
+        #TorM3 = params["kTo"] * wM3 ** 2
+        #TorM4 = params["kTo"] * wM4 ** 2
 
         # Wind Model (zero in expectation)
         # ---------------------------
@@ -351,8 +339,8 @@ class state_dot:
         # State Derivatives (from PyDy) This is already the analytically solved vector of MM*x = RHS
         # ---------------------------
         DynamicsDot = ca.vertcat(
-                xdot,
-                ydot,
+                wM1,
+                wM2,
                 0, # zdot,
                 -0.5 * p * q1 - 0.5 * q * q2 - 0.5 * q3 * r,
                 0.5 * p * q0 - 0.5 * q * q3 + 0.5 * q2 * r,
@@ -362,40 +350,42 @@ class state_dot:
                     params["Cd"]
                     * ca.sign(velW * ca.cos(qW1) * ca.cos(qW2) - xdot)
                     * (velW * ca.cos(qW1) * ca.cos(qW2) - xdot) ** 2
-                    - 2 * (q0 * q2 + q1 * q3) * (ThrM1 + ThrM2 + ThrM3 + ThrM4)
+                    - 2 * (q0 * q2 + q1 * q3) * (ThrM1 + ThrM2) #+ ThrM3 + ThrM4
                 )
                 / params["mB"],
                 (
                     params["Cd"]
                     * ca.sign(velW * ca.sin(qW1) * ca.cos(qW2) - ydot)
                     * (velW * ca.sin(qW1) * ca.cos(qW2) - ydot) ** 2
-                    + 2 * (q0 * q1 - q2 * q3) * (ThrM1 + ThrM2 + ThrM3 + ThrM4)
+                    + 2 * (q0 * q1 - q2 * q3) * (ThrM1 + ThrM2) #+ ThrM3 + ThrM4
                 )
                 / params["mB"],
-                (
-                    -params["Cd"] * ca.sign(velW * ca.sin(qW2) + zdot) * (velW * ca.sin(qW2) + zdot) ** 2
-                    - (ThrM1 + ThrM2 + ThrM3 + ThrM4)
-                    * (q0 ** 2 - q1 ** 2 - q2 ** 2 + q3 ** 2)
-                    + params["g"] * params["mB"]
-                )
-                / params["mB"],
+                0,
+                # (
+                #     -params["Cd"] * ca.sign(velW * ca.sin(qW2) + zdot) * (velW * ca.sin(qW2) + zdot) ** 2
+                #     - (ThrM1 + ThrM2) #+ ThrM3 + ThrM4
+                #     * (q0 ** 2 - q1 ** 2 - q2 ** 2 + q3 ** 2)
+                #     + params["g"] * params["mB"]
+                # )
+                # / params["mB"],
                 (
                     (IByy - IBzz) * q * r
-                    - params["usePrecession"] * params["IRzz"] * (wM1 - wM2 + wM3 - wM4) * q
-                    + (ThrM1 - ThrM2 - ThrM3 + ThrM4) * params["dym"]
+                    - params["usePrecession"] * params["IRzz"] * (wM1 - wM2) * q #+ wM3 - wM4
+                    + (ThrM1 - ThrM2) * params["dym"] #- ThrM3 + ThrM4
                 )
                 / IBxx,  # uP activates or deactivates the use of gyroscopic precession.
                 (
                     (IBzz - IBxx) * p * r
-                    + params["usePrecession"] * params["IRzz"] * (wM1 - wM2 + wM3 - wM4) * p
-                    + (ThrM1 + ThrM2 - ThrM3 - ThrM4) * params["dxm"]
+                    + params["usePrecession"] * params["IRzz"] * (wM1 - wM2) * p # + wM3 - wM4
+                    + (ThrM1 + ThrM2) * params["dxm"] # - ThrM3 - ThrM4
                 )
                 / IByy,  # Set uP to False if rotor inertia is not known (gyro precession has negigeable effect on drone dynamics)
-                ((IBxx - IByy) * p * q - TorM1 + TorM2 - TorM3 + TorM4) / IBzz,
-                cmd[0]/params["IRzz"], cmd[1]/params["IRzz"], cmd[2]/params["IRzz"], cmd[3]/params["IRzz"]
+                ((IBxx - IByy) * p * q - TorM1 + TorM2) / IBzz, #- TorM3 + TorM4
+                cmd[0]/params["IRzz"], cmd[1]/params["IRzz"]
+                #, cmd[2]/params["IRzz"], cmd[3]/params["IRzz"]
         )
 
-        if DynamicsDot.shape[1] == 17:
+        if DynamicsDot.shape[1] == 15:
             print('fin')
 
         # State Derivative Vector
