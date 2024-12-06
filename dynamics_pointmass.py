@@ -346,20 +346,22 @@ class state_dot:
                 0.5 * p * q0 - 0.5 * q * q3 + 0.5 * q2 * r,
                 0.5 * p * q3 + 0.5 * q * q0 - 0.5 * q1 * r,
                 -0.5 * p * q2 + 0.5 * q * q1 + 0.5 * q0 * r,
-                (
-                    params["Cd"]
-                    * ca.sign(velW * ca.cos(qW1) * ca.cos(qW2) - xdot)
-                    * (velW * ca.cos(qW1) * ca.cos(qW2) - xdot) ** 2
-                    - 2 * (q0 * q2 + q1 * q3) * (ThrM1 + ThrM2) #+ ThrM3 + ThrM4
-                )
-                / params["mB"],
-                (
-                    params["Cd"]
-                    * ca.sign(velW * ca.sin(qW1) * ca.cos(qW2) - ydot)
-                    * (velW * ca.sin(qW1) * ca.cos(qW2) - ydot) ** 2
-                    + 2 * (q0 * q1 - q2 * q3) * (ThrM1 + ThrM2) #+ ThrM3 + ThrM4
-                )
-                / params["mB"],
+                
+                wM1/0.1,
+                #     params["Cd"]
+                #     * ca.sign(velW * ca.cos(qW1) * ca.cos(qW2) - xdot)
+                #     * (velW * ca.cos(qW1) * ca.cos(qW2) - xdot) ** 2
+                #     - 2 * (q0 * q2 + q1 * q3) * (ThrM1 + ThrM2) #+ ThrM3 + ThrM4
+                # )
+                # / params["mB"],
+                wM2/0.1,
+                # (
+                #     params["Cd"]
+                #     * ca.sign(velW * ca.sin(qW1) * ca.cos(qW2) - ydot)
+                #     * (velW * ca.sin(qW1) * ca.cos(qW2) - ydot) ** 2
+                #     + 2 * (q0 * q1 - q2 * q3) * (ThrM1 + ThrM2) #+ ThrM3 + ThrM4
+                # )
+                # / params["mB"],
                 0,
                 # (
                 #     -params["Cd"] * ca.sign(velW * ca.sin(qW2) + zdot) * (velW * ca.sin(qW2) + zdot) ** 2

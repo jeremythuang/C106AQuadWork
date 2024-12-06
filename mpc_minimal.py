@@ -129,7 +129,7 @@ if __name__ == "__main__":
     quad_params = get_quad_params()
 
     x = quad_params["default_init_state_np"]
-    Ti, Tf, Ts = 0.0, 5.0, 0.1
+    Ti, Tf, Ts = 0.0, 1.0, 0.1
     N = 30
 
     mpc = MPC(N=N,Ts=Ts,f=state_dot.casadi,p=quad_params)
