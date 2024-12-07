@@ -242,7 +242,7 @@ if __name__ == "__main__":
     import matplotlib.pyplot as plt
     
     import reference
-    from dynamics import get_quad_params, state_dot
+    from dynamics_pointmass import get_quad_params, state_dot
     from utils.quad import Animator
 
     quad_params = get_quad_params()

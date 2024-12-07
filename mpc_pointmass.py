@@ -20,8 +20,8 @@ class MPC:
             p: Dict,        # quad parameters dictionary
         ) -> None:
 
-        n = 17
-        m = 4
+        n = 15
+        m = 2 #command velocity in X and Y
         
         # create optimizer container and define its optimization variables
         self.opti = ca.Opti()
@@ -31,9 +31,9 @@ class MPC:
 
         # define cost function weights
         #           {x,y,z,q0,q1,q2,q3,xd,yd,zd,p,q,r,wM1,wM2,wM3,wM4}
-        Q = np.diag([1,1,1,0, 0, 0, 0, 1, 1, 1, 1,1,1,0,  0,  0,  0  ])
+        Q = np.diag([1,1,1,0, 0, 0, 0, 1, 1, 1, 1,1,1,0, 0])
         #           {wM1d, wM2d, wM3d, wM4d}
-        R = np.diag([1,    1,    1,    1])
+        R = np.diag([1,    1])
 
         # apply initial condition constraints
         self.init = self.opti.parameter(n,1) # opti parameters are non-optimized variables that we can change at runtime
@@ -74,7 +74,7 @@ class MPC:
             return cost
         
         # apply the static reference cost to the opti container
-        ref = np.array([2,2,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0])
+        ref = np.array([2,2,1,1,0,0,0,0,0,0,0,0,0,0,0])
         self.opti.minimize(J(self.X, ref, self.U))
 
         # tell the opti container we want to use IPOPT to optimize, and define settings for the solver
@@ -123,13 +123,13 @@ class MPC:
     
 if __name__ == "__main__":
 
-    from dynamics import get_quad_params, state_dot
+    from dynamics_pointmass import get_quad_params, state_dot
     from utils.quad import Animator
 
     quad_params = get_quad_params()
 
     x = quad_params["default_init_state_np"]
-    Ti, Tf, Ts = 0.0, 1.0, 0.1
+    Ti, Tf, Ts = 0.0, 5.0, 0.1
     N = 30
 
     mpc = MPC(N=N,Ts=Ts,f=state_dot.casadi,p=quad_params)
@@ -161,3 +161,4 @@ if __name__ == "__main__":
     animator.animate()
 
     print('fin')
+
