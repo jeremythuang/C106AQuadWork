@@ -76,6 +76,7 @@ class MPC:
     def __call__(self, x, r):
 
         self.opti.set_value(self.x0, x)
+        self.opti.set_value(self.r, r)
         self.opti.set_initial(self.X, self.x_sol)
         self.opti.set_initial(self.U, self.u_sol)
 
