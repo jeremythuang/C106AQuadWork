@@ -1,5 +1,6 @@
 import casadi as ca
 import numpy as np
+import csv
 from tqdm import tqdm
 
 def f(x, u):
@@ -20,11 +21,10 @@ def f(x, u):
 class MPC:
     def __init__(
             self,
-            N, Ts, f
+            N, Ts, f, xc, yc, rc
         ) -> None:
 
         n, m = 4, 2
-        xc, yc, rc = 1, 1, 0.5
 
         self.opti = ca.Opti()
         self.X = self.opti.variable(n, N+1) # first state plays no role
@@ -92,11 +92,12 @@ if __name__ == "__main__":
 
     Ti, Ts, Tf = 0.0, 0.1, 7.5
     N = 35
-
-    mpc = MPC(N, Ts, f)
-
     x = np.array([2, 2, 0, 0.])
     r = np.array([-2,-2, 0, 0])
+    xc, yc, rc = 1, 1, 0.5
+
+    mpc = MPC(N, Ts, f, xc, yc, rc)
+    
     x_hist = [x]
     x_preds = []
     times = np.arange(Ti, Tf, Ts)
@@ -114,3 +115,6 @@ if __name__ == "__main__":
     ax.plot(x_hist[1:,0], x_hist[1:,1])
     ax.add_patch(Circle([1, 1], 0.5))
     plt.savefig('test.png')
+    with open("waypoints.csv", "w", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerows(x_hist[1:,0:2][::-1])
