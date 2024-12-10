@@ -14,7 +14,7 @@ def f(x, u):
         [0.0, 0.0], 
         [0.0, 0.0],
         [1.0, 0.0],
-        [0.0, 1.0]
+        [0.0, 0.5]
     ])
     return A @ x + B @ u
 
@@ -32,7 +32,7 @@ class MPC:
         self.x0 = self.opti.parameter(n, 1)
         self.r = self.opti.parameter(n, 1) # reference parameter
 
-        Q = np.diag([1,1,1,1.]) * 5
+        Q = np.diag([0,0,0.,0.]) * 5
         R = np.diag([1,1.]) * 0.1
 
         # box
@@ -56,6 +56,9 @@ class MPC:
             current_time = ca.sum1(k * Ts)
             multiplier = 1 + current_time * 0.1
             self.opti.subject_to(rc ** 2 * multiplier <= (self.X[0,k+2] - xc)**2 + (self.X[1,k+2] - yc)**2)
+
+        # equality constraint to reach end
+        self.opti.subject_to(self.X[:,-1] == self.r)
 
         self.opti.solver('ipopt', {'ipopt.print_level':0, 'print_time':0, 'ipopt.tol': 1e-6})
         cost = ca.MX(0)
@@ -90,8 +93,8 @@ if __name__ == "__main__":
     import matplotlib.pyplot as plt
     from matplotlib.patches import Circle
 
-    Ti, Ts, Tf = 0.0, 0.1, 7.5
-    N = 35
+    Ti, Ts, Tf = 0.0, 0.1, 15.0
+    N = 75
     x = np.array([2, 2, 0, 0.])
     r = np.array([-2,-2, 0, 0])
     xc, yc, rc = 1, 1, 0.5
@@ -117,4 +120,4 @@ if __name__ == "__main__":
     plt.savefig('test.png')
     with open("waypoints.csv", "w", newline="") as file:
         writer = csv.writer(file)
-        writer.writerows(x_hist[1:,0:2][::-1])
+        writer.writerows(x_hist[1:,:][::-1])
